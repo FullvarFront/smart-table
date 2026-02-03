@@ -1,7 +1,3 @@
-import { createComparison, defaultRules } from "../lib/compare.js";
-
-const compare = createComparison(defaultRules);
-
 export function initFiltering(elements) {
   const updateIndexes = (elements, indexes) => {
     Object.keys(indexes).forEach((elementName) => {
@@ -10,10 +6,11 @@ export function initFiltering(elements) {
           elements[elementName].remove(1);
         }
 
+        // indexes[elementName] это объект {id: "имя"}, берем значения
         Object.values(indexes[elementName])
           .map((name) => {
             const option = document.createElement("option");
-            option.value = name;
+            option.value = name; // сохраняем полное имя как значение
             option.textContent = name;
             return option;
           })
@@ -26,30 +23,26 @@ export function initFiltering(elements) {
 
   const applyFiltering = (query, state, action) => {
     if (action && action.name === "clear") {
-      const field = action.dataset.field;
-      const parent = action.closest(".filter-group");
-      const input = parent.querySelector("input");
-      if (input) {
-        input.value = "";
-        state[field] = "";
+      const fieldName = action.dataset.field;
+      if (fieldName && elements[fieldName]) {
+        elements[fieldName].value = "";
       }
     }
 
-    const filter = {};
-    Object.keys(elements).forEach((key) => {
-      if (elements[key]) {
-        if (
-          ["INPUT", "SELECT"].includes(elements[key].tagName) &&
-          elements[key].value
-        ) {
-          filter[`filter[${elements[key].name}]`] = elements[key].value;
-        }
-      }
-    });
+    const filterValues = {};
 
-    return Object.keys(filter).length
-      ? Object.assign({}, query, filter)
-      : query;
+    if (elements.searchBySeller && elements.searchBySeller.value) {
+      filterValues["seller"] = elements.searchBySeller.value;
+    }
+
+    if (Object.keys(filterValues).length > 0) {
+      return {
+        ...query,
+        filters: filterValues,
+      };
+    }
+
+    return query;
   };
 
   return {

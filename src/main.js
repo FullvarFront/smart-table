@@ -1,8 +1,6 @@
 import "./fonts/ys-display/fonts.css";
 import "./style.css";
 
-import { data as sourceData } from "./data/dataset_1.js";
-
 import { initData } from "./data.js";
 import { processFormData } from "./lib/utils.js";
 
@@ -12,7 +10,7 @@ import { initSorting } from "./components/sorting.js";
 import { initFiltering } from "./components/filtering.js";
 import { initSearching } from "./components/searching.js";
 
-const api = initData(sourceData);
+const api = initData();
 
 function collectState() {
   const state = processFormData(new FormData(sampleTable.container));
@@ -35,9 +33,7 @@ async function render(action) {
   query = applySorting(query, state, action);
   query = applyPagination(query, state, action);
 
-  console.log("Final query to getRecords:", query);
   const { total, items } = await api.getRecords(query);
-  console.log("Received items:", items.length);
 
   updatePagination(total, query);
   sampleTable.render(items);
@@ -81,7 +77,6 @@ appRoot.appendChild(sampleTable.container);
 
 async function init() {
   const indexes = await api.getIndexes();
-  console.log("Indexes loaded:", indexes);
   updateIndexes(sampleTable.filter.elements, {
     searchBySeller: indexes.sellers,
   });

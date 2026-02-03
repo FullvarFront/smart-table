@@ -7,27 +7,10 @@ export const initPagination = (
   const pageTemplate = pages.firstElementChild.cloneNode(true);
   pages.firstElementChild.remove();
 
-  let lastPageCount = 0;
-
-  const updatePagination = (total, query) => {
-    const pageCount = Math.ceil(total / query.rowsPerPage);
-    lastPageCount = pageCount;
-
-    const visiblePages = getPages(query.page, pageCount, 5);
-    pages.replaceChildren(
-      ...visiblePages.map((pageNumber) => {
-        const el = pageTemplate.cloneNode(true);
-        return createPage(el, pageNumber, pageNumber === query.page);
-      }),
-    );
-
-    fromRow.textContent = (query.page - 1) * query.rowsPerPage + 1;
-    toRow.textContent = Math.min(query.page * query.rowsPerPage, total);
-    totalRows.textContent = total;
-  };
+  let pageCount;
 
   const applyPagination = (query, state, action) => {
-    const rowsPerPage = state.rowsPerPage;
+    const limit = state.rowsPerPage;
     let page = state.page;
 
     if (action) {
@@ -36,13 +19,13 @@ export const initPagination = (
           page = Math.max(1, page - 1);
           break;
         case "next":
-          page = Math.min(lastPageCount, page + 1);
+          page = Math.min(pageCount || Infinity, page + 1);
           break;
         case "first":
           page = 1;
           break;
         case "last":
-          page = lastPageCount;
+          page = pageCount || 1;
           break;
       }
     }
@@ -50,8 +33,24 @@ export const initPagination = (
     return {
       ...query,
       page: page,
-      rowsPerPage: rowsPerPage,
+      rowsPerPage: limit,
     };
+  };
+
+  const updatePagination = (total, { page, rowsPerPage }) => {
+    pageCount = Math.ceil(total / rowsPerPage);
+
+    const visiblePages = getPages(page, pageCount, 5);
+    pages.replaceChildren(
+      ...visiblePages.map((pageNumber) => {
+        const el = pageTemplate.cloneNode(true);
+        return createPage(el, pageNumber, pageNumber === page);
+      }),
+    );
+
+    fromRow.textContent = (page - 1) * rowsPerPage + 1;
+    toRow.textContent = Math.min(page * rowsPerPage, total);
+    totalRows.textContent = total;
   };
 
   return { applyPagination, updatePagination };
