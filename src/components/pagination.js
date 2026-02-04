@@ -33,12 +33,12 @@ export const initPagination = (
     return {
       ...query,
       page: page,
-      rowsPerPage: limit,
+      limit: limit,
     };
   };
 
-  const updatePagination = (total, { page, rowsPerPage }) => {
-    pageCount = Math.ceil(total / rowsPerPage);
+  const updatePagination = (total, { page, limit }) => {
+    pageCount = Math.ceil(total / limit);
 
     const visiblePages = getPages(page, pageCount, 5);
     pages.replaceChildren(
@@ -48,8 +48,8 @@ export const initPagination = (
       }),
     );
 
-    fromRow.textContent = (page - 1) * rowsPerPage + 1;
-    toRow.textContent = Math.min(page * rowsPerPage, total);
+    fromRow.textContent = (page - 1) * limit + 1;
+    toRow.textContent = Math.min(page * limit, total);
     totalRows.textContent = total;
   };
 

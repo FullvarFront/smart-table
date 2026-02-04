@@ -6,11 +6,10 @@ export function initFiltering(elements) {
           elements[elementName].remove(1);
         }
 
-        // indexes[elementName] это объект {id: "имя"}, берем значения
         Object.values(indexes[elementName])
           .map((name) => {
             const option = document.createElement("option");
-            option.value = name; // сохраняем полное имя как значение
+            option.value = name;
             option.textContent = name;
             return option;
           })
@@ -35,10 +34,33 @@ export function initFiltering(elements) {
       filterValues["seller"] = elements.searchBySeller.value;
     }
 
-    if (Object.keys(filterValues).length > 0) {
+    if (elements.searchByDate && elements.searchByDate.value) {
+      filterValues["date"] = elements.searchByDate.value;
+    }
+
+    if (elements.searchByCustomer && elements.searchByCustomer.value) {
+      filterValues["customer"] = elements.searchByCustomer.value;
+    }
+
+    if (elements.totalFrom && elements.totalFrom.value) {
+      filterValues["total_from"] = elements.totalFrom.value;
+    }
+
+    if (elements.totalTo && elements.totalTo.value) {
+      filterValues["total_to"] = elements.totalTo.value;
+    }
+
+    const filters = {};
+    Object.entries(filterValues).forEach(([key, value]) => {
+      if (value) {
+        filters[`filter[${key}]`] = value;
+      }
+    });
+
+    if (Object.keys(filters).length > 0) {
       return {
         ...query,
-        filters: filterValues,
+        ...filters,
       };
     }
 
