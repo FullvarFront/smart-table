@@ -43,11 +43,11 @@ export function initFiltering(elements) {
     }
 
     if (elements.totalFrom && elements.totalFrom.value) {
-      filterValues["total_from"] = elements.totalFrom.value;
+      filterValues["totalFrom"] = elements.totalFrom.value;
     }
 
     if (elements.totalTo && elements.totalTo.value) {
-      filterValues["total_to"] = elements.totalTo.value;
+      filterValues["totalTo"] = elements.totalTo.value;
     }
 
     const filters = {};
